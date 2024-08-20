@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.activity.mapper.SysActivitiesMapper">
+    
+    <resultMap type="SysActivities" id="SysActivitiesResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="date"    column="date"    />
+        <result property="time"    column="time"    />
+        <result property="organizer"    column="organizer"    />
+        <result property="content"    column="content"    />
+        <result property="max"    column="max"    />
+        <result property="address"    column="address"    />
+        <result property="account"    column="account"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectSysActivitiesVo">
+        select id, name, date, time, organizer, content, max, address, account, status from sys_activities
+    </sql>
+
+    <select id="selectSysActivitiesList" parameterType="SysActivities" resultMap="SysActivitiesResult">
+        <include refid="selectSysActivitiesVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="date != null "> and date = #{date}</if>
+            <if test="time != null "> and time = #{time}</if>
+            <if test="organizer != null  and organizer != ''"> and organizer = #{organizer}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="max != null "> and max = #{max}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="account != null "> and account = #{account}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysActivitiesById" parameterType="String" resultMap="SysActivitiesResult">
+        <include refid="selectSysActivitiesVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysActivities" parameterType="SysActivities" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_activities
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="date != null">date,</if>
+            <if test="time != null">time,</if>
+            <if test="organizer != null">organizer,</if>
+            <if test="content != null">content,</if>
+            <if test="max != null">max,</if>
+            <if test="address != null">address,</if>
+            <if test="account != null">account,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="date != null">#{date},</if>
+            <if test="time != null">#{time},</if>
+            <if test="organizer != null">#{organizer},</if>
+            <if test="content != null">#{content},</if>
+            <if test="max != null">#{max},</if>
+            <if test="address != null">#{address},</if>
+            <if test="account != null">#{account},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysActivities" parameterType="SysActivities">
+        update sys_activities
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="date != null">date = #{date},</if>
+            <if test="time != null">time = #{time},</if>
+            <if test="organizer != null">organizer = #{organizer},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="max != null">max = #{max},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="account != null">account = #{account},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysActivitiesById" parameterType="String">
+        delete from sys_activities where id = #{id}
+    </delete>
+
+    <delete id="deleteSysActivitiesByIds" parameterType="String">
+        delete from sys_activities where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

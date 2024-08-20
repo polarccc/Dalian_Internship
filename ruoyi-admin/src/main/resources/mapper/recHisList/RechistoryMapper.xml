@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.recHisList.mapper.RechistoryMapper">
+    
+    <resultMap type="Rechistory" id="RechistoryResult">
+        <result property="recLogId"    column="rec_log_id"    />
+        <result property="recName"    column="rec_name"    />
+        <result property="candidateCondition"    column="candidate_condition"    />
+        <result property="recResult"    column="rec_result"    />
+        <result property="recCondition"    column="rec_condition"    />
+        <result property="recTime"    column="rec_time"    />
+        <result property="pubName"    column="pub_name"    />
+    </resultMap>
+
+<!--    随个人中心改正-->
+    <sql id="selectRechistoryVo">
+        select rec_log_id, rec_name, candidate_condition, rec_result, rec_condition, rec_time, pub_name from recommendation_list
+    </sql>
+
+    <select id="selectRechistoryList" parameterType="Rechistory" resultMap="RechistoryResult">
+        <include refid="selectRechistoryVo"/>
+        <where>
+            <if test="recName != null  and recName != ''"> and rec_name like concat('%', #{recName}, '%')</if>
+            <if test="candidateCondition != null  and candidateCondition != ''"> and candidate_condition = #{candidateCondition}</if>
+            <if test="recResult != null  and recResult != ''"> and rec_result = #{recResult}</if>
+            <if test="recCondition != null  and recCondition != ''"> and rec_condition = #{recCondition}</if>
+            <if test="recTime != null  and recTime != ''"> and rec_time = #{recTime}</if>
+            <if test="pubName != null  and pubName != ''"> and pub_name like concat('%', #{pubName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectRechistoryByRecLogId" parameterType="Long" resultMap="RechistoryResult">
+        <include refid="selectRechistoryVo"/>
+        where rec_log_id = #{recLogId}
+    </select>
+
+    <insert id="insertRechistory" parameterType="Rechistory" useGeneratedKeys="true" keyProperty="recLogId">
+        insert into rechistory
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recName != null and recName != ''">rec_name,</if>
+            <if test="candidateCondition != null and candidateCondition != ''">candidate_condition,</if>
+            <if test="recResult != null and recResult != ''">rec_result,</if>
+            <if test="recCondition != null">rec_condition,</if>
+            <if test="recTime != null">rec_time,</if>
+            <if test="pubName != null">pub_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="recName != null and recName != ''">#{recName},</if>
+            <if test="candidateCondition != null and candidateCondition != ''">#{candidateCondition},</if>
+            <if test="recResult != null and recResult != ''">#{recResult},</if>
+            <if test="recCondition != null">#{recCondition},</if>
+            <if test="recTime != null">#{recTime},</if>
+            <if test="pubName != null">#{pubName},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRechistory" parameterType="Rechistory">
+        update rechistory
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="recName != null and recName != ''">rec_name = #{recName},</if>
+            <if test="candidateCondition != null and candidateCondition != ''">candidate_condition = #{candidateCondition},</if>
+            <if test="recResult != null and recResult != ''">rec_result = #{recResult},</if>
+            <if test="recCondition != null">rec_condition = #{recCondition},</if>
+            <if test="recTime != null">rec_time = #{recTime},</if>
+            <if test="pubName != null">pub_name = #{pubName},</if>
+        </trim>
+        where rec_log_id = #{recLogId}
+    </update>
+
+<!--    删除逻辑（状态必须是待审核才可以）-->
+    <delete id="deleteRechistoryByRecLogId" parameterType="Long">
+        delete from recommendation_list where rec_log_id = #{recLogId} and rec_condition = '待审核'
+    </delete>
+
+<!--    还需要删除inner_recommendation_item中的部分-->
+    <delete id="deleteInnerRecommendationItem" parameterType="Long">
+        DELETE FROM inner_recommendation_item
+        WHERE rec_name = #{recName}
+          AND pub_name = #{pubName}
+          AND rec_condition = #{candidateCondition}
+          AND rec_expect = #{recResult}
+    </delete>
+
+    <delete id="deleteRechistoryByRecLogIds" parameterType="String">
+        delete from rechistory where rec_log_id in 
+        <foreach item="recLogId" collection="array" open="(" separator="," close=")">
+            #{recLogId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.joinactivity.mapper.SysJoinActivityMapper">
+    
+    <resultMap type="SysJoinActivity" id="SysJoinActivityResult">
+        <result property="id"    column="id"    />
+        <result property="uid"    column="uid"    />
+        <result property="activityId"    column="activity_id"    />
+    </resultMap>
+    <resultMap type="SysActivities" id="SysActivitiesResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="date"    column="date"    />
+        <result property="time"    column="time"    />
+        <result property="organizer"    column="organizer"    />
+        <result property="content"    column="content"    />
+        <result property="max"    column="max"    />
+        <result property="address"    column="address"    />
+        <result property="account"    column="account"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectSysJoinActivityVo">
+        select id, uid, activity_id from sys_join_activity
+    </sql>
+
+    <select id="selectSysJoinActivityList" parameterType="SysJoinActivity" resultMap="SysJoinActivityResult">
+        <include refid="selectSysJoinActivityVo"/>
+        <where>  
+            <if test="uid != null "> and uid = #{uid}</if>
+            <if test="activityId != null "> and activity_id = #{activityId}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysJoinActivityById" parameterType="Long" resultMap="SysJoinActivityResult">
+        <include refid="selectSysJoinActivityVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysJoinActivity" parameterType="SysJoinActivity">
+        insert into sys_join_activity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="uid != null">uid,</if>
+            <if test="activityId != null">activity_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="uid != null">#{uid},</if>
+            <if test="activityId != null">#{activityId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysJoinActivity" parameterType="SysJoinActivity">
+        update sys_join_activity
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="uid != null">uid = #{uid},</if>
+            <if test="activityId != null">activity_id = #{activityId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysJoinActivityById" parameterType="Map">
+        delete from sys_join_activity where uid = #{id} and activity_id= #{activity_id}
+    </delete>
+
+    <delete id="deleteSysJoinActivityByIds" parameterType="String">
+        delete from sys_join_activity where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selected" parameterType="SysActivities" resultMap="SysActivitiesResult">
+        SELECT sa.*
+        FROM sys_activities sa
+        <where>
+            <if test="true">
+                sa.id  IN (
+                SELECT sa.id
+                FROM sys_activities sa
+                INNER JOIN sys_join_activity sja ON sa.id = sja.activity_id
+                WHERE sja.uid = #{id}
+                )
+            </if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="date != null "> and date = #{date}</if>
+            <if test="time != null "> and time = #{time}</if>
+            <if test="organizer != null  and organizer != ''"> and organizer = #{organizer}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="max != null "> and max = #{max}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="account != null "> and account = #{account}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="noSelect" parameterType="SysActivities" resultMap="SysActivitiesResult">
+        SELECT sa.*
+        FROM sys_activities sa
+        <where>
+            <if test="true">
+                sa.id NOT IN (
+                SELECT sa.id
+                FROM sys_activities sa
+                INNER JOIN sys_join_activity sja ON sa.id = sja.activity_id
+                WHERE sja.uid = #{id}
+                )
+            </if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="date != null "> and date = #{date}</if>
+            <if test="time != null "> and time = #{time}</if>
+            <if test="organizer != null  and organizer != ''"> and organizer = #{organizer}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="max != null "> and max = #{max}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="account != null "> and account = #{account}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+
+    <update id="activityAcountAdd" parameterType="SysActivities">
+        UPDATE sys_activities
+        SET account = account + 1
+        where id=#{activityId}
+    </update>
+    <update id="activityAcountReduce" parameterType="Long">
+        UPDATE sys_activities
+        SET account = account - 1
+        where id=#{activity_id}
+    </update>
+
+
+</mapper>

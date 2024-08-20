@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.article.mapper.SysArticlesMapper">
+    
+    <resultMap type="SysArticles" id="SysArticlesResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="articleTitle"    column="article_title"    />
+        <result property="articleContent"    column="article_content"    />
+        <result property="auditStatus"    column="audit_status"    />
+        <result property="isDeleted"    column="is_deleted"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="autherName"    column="auther_name"    />
+    </resultMap>
+
+    <sql id="selectSysArticlesVo">
+        select id, user_id, article_title, article_content, audit_status, is_deleted, create_time, update_time, auther_name from sys_articles
+    </sql>
+
+    <select id="selectSysArticlesList" parameterType="SysArticles" resultMap="SysArticlesResult">
+        <include refid="selectSysArticlesVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="articleTitle != null  and articleTitle != ''"> and article_title = #{articleTitle}</if>
+            <if test="articleContent != null  and articleContent != ''"> and article_content = #{articleContent}</if>
+            <if test="auditStatus != null "> and audit_status = #{auditStatus}</if>
+            <if test="isDeleted != null "> and is_deleted = #{isDeleted}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="updateTime != null "> and update_time = #{updateTime}</if>
+            <if test="autherName != null  and autherName != ''"> and auther_name like concat('%', #{autherName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectSysArticlesById" parameterType="Long" resultMap="SysArticlesResult">
+        <include refid="selectSysArticlesVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysArticles" parameterType="SysArticles" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_articles
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="articleTitle != null and articleTitle != ''">article_title,</if>
+            <if test="articleContent != null and articleContent != ''">article_content,</if>
+            <if test="auditStatus != null">audit_status,</if>
+            <if test="isDeleted != null">is_deleted,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="autherName != null and autherName != ''">auther_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="articleTitle != null and articleTitle != ''">#{articleTitle},</if>
+            <if test="articleContent != null and articleContent != ''">#{articleContent},</if>
+            <if test="auditStatus != null">#{auditStatus},</if>
+            <if test="isDeleted != null">#{isDeleted},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="autherName != null and autherName != ''">#{autherName},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysArticles" parameterType="SysArticles">
+        update sys_articles
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="articleTitle != null and articleTitle != ''">article_title = #{articleTitle},</if>
+            <if test="articleContent != null and articleContent != ''">article_content = #{articleContent},</if>
+            <if test="auditStatus != null">audit_status = #{auditStatus},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="autherName != null and autherName != ''">auther_name = #{autherName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysArticlesById" parameterType="Long">
+        delete from sys_articles where id = #{id}
+    </delete>
+
+    <delete id="deleteSysArticlesByIds" parameterType="String">
+        delete from sys_articles where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

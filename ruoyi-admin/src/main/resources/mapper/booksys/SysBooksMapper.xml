@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.booksys.mapper.SysBooksMapper">
+    
+    <resultMap type="SysBooks" id="SysBooksResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="author"    column="author"    />
+    </resultMap>
+
+    <sql id="selectSysBooksVo">
+        select id, name, author from sys_books
+    </sql>
+
+    <select id="selectSysBooksList" parameterType="SysBooks" resultMap="SysBooksResult">
+        <include refid="selectSysBooksVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="author != null  and author != ''"> and author = #{author}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysBooksById" parameterType="Long" resultMap="SysBooksResult">
+        <include refid="selectSysBooksVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertSysBooks" parameterType="SysBooks">
+        insert into sys_books
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="author != null">author,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="author != null">#{author},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysBooks" parameterType="SysBooks">
+        update sys_books
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="author != null">author = #{author},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysBooksById" parameterType="Long">
+        delete from sys_books where id = #{id}
+    </delete>
+
+    <delete id="deleteSysBooksByIds" parameterType="String">
+        delete from sys_books where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

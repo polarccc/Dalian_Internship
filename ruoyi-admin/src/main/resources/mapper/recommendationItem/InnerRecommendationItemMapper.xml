@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.recommendationItem.mapper.InnerRecommendationItemMapper">
+
+<!--    //实现结果集到对象的转换-->
+    <resultMap type="InnerRecommendationItem" id="InnerRecommendationItemResult">
+        <result property="recName"    column="rec_name"    />
+        <result property="pubName"    column="pub_name"    />
+        <result property="recCondition"    column="rec_condition"    />
+        <result property="recResume"    column="rec_resume"    />
+        <result property="recTime"    column="rec_time"    />
+        <result property="recExpect"    column="rec_expect"    />
+    </resultMap>
+
+<!--    //书写可复用的select语句：<include refid="selectInnerRecommendationItemVo" />-->
+    <sql id="selectInnerRecommendationItemVo">
+        select rec_name, pub_name, rec_condition, rec_resume, rec_time, rec_expect from inner_recommendation_item
+    </sql>
+
+
+
+    <select id="selectInnerRecommendationItemList" parameterType="InnerRecommendationItem" resultMap="InnerRecommendationItemResult">
+#         <include refid="selectInnerRecommendationItemVo"/>引用刚才的选择
+        <where>  
+            <if test="recName != null  and recName != ''"> and rec_name like concat('%', #{recName}, '%')</if>
+            <if test="pubName != null  and pubName != ''"> and pub_name like concat('%', #{pubName}, '%')</if>
+            <if test="recCondition != null  and recCondition != ''"> and rec_condition = #{recCondition}</if>
+            <if test="recResume != null  and recResume != ''"> and rec_resume = #{recResume}</if>
+            <if test="recTime != null "> and rec_time = #{recTime}</if>
+            <if test="recExpect != null  and recExpect != ''"> and rec_expect = #{recExpect}</if>
+        </where>
+    </select>
+
+<!--    根据姓名选择-->
+    <select id="selectInnerRecommendationItemByRecName" parameterType="String" resultMap="InnerRecommendationItemResult">
+        <include refid="selectInnerRecommendationItemVo"/>
+        where rec_name = #{recName} and pub_name = #{pubName}
+    </select>
+
+<!--    根据pub_name或者rec_name模糊查询-->
+    <insert id="insertInnerRecommendationItem" parameterType="InnerRecommendationItem">
+        insert into inner_recommendation_item
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recName != null and recName != ''">rec_name,</if>
+            <if test="pubName != null and pubName != ''">pub_name,</if>
+            <if test="recCondition != null and recCondition != ''">rec_condition,</if>
+            <if test="recResume != null and recResume != ''">rec_resume,</if>
+            <if test="recTime != null">rec_time,</if>
+            <if test="recExpect != null and recExpect != ''">rec_expect,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="recName != null and recName != ''">#{recName},</if>
+            <if test="pubName != null and pubName != ''">#{pubName},</if>
+            <if test="recCondition != null and recCondition != ''">#{recCondition},</if>
+            <if test="recResume != null and recResume != ''">#{recResume},</if>
+            <if test="recTime != null">#{recTime},</if>
+            <if test="recExpect != null and recExpect != ''">#{recExpect},</if>
+         </trim>
+    </insert>
+
+<!--    修改的逻辑-->
+    <update id="updateInnerRecommendationItem" parameterType="InnerRecommendationItem">
+        update inner_recommendation_item
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pubName != null and pubName != ''">pub_name = #{pubName},</if>
+            <if test="recCondition != null and recCondition != ''">rec_condition = #{recCondition},</if>
+            <if test="recResume != null and recResume != ''">rec_resume = #{recResume},</if>
+            <if test="recTime != null">rec_time = #{recTime},</if>
+            <if test="recExpect != null and recExpect != ''">rec_expect = #{recExpect},</if>
+        </trim>
+        where rec_name = #{recName} and pub_name = #{pubName}
+    </update>
+<!--    对内推一览表的更改-->
+    <update id="updateRecommendationSys" parameterType="InnerRecommendationItem">
+        update recommendation_list
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pubName != null and pubName != ''">pub_name = #{pubName},</if>
+            <if test="recCondition != null and recCondition != ''">candidate_condition = #{recCondition},</if>
+            <if test="recExpect != null and recExpect != ''">rec_result = #{recExpect},</if>
+            <if test="recResume != null and recResume != ''">rec_resume = #{recResume},</if>
+        </trim>
+        where rec_name = #{recName} and pub_name = #{pubName} and rec_condition = '待审核'
+    </update>
+<!--    对内推一览表的插入-->
+    <insert id="insertRecommendationSys" parameterType="InnerRecommendationItem">
+        insert into recommendation_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recName != null and recName != ''">rec_name,</if>
+            <if test="pubName != null and pubName != ''">pub_name,</if>
+            <if test="recCondition != null and recCondition != ''">candidate_condition,</if>
+            <if test="recResume != null and recResume != ''">rec_resume,</if>
+<!--            <if test="recTime != null">rec_time,</if>-->
+            <if test="recExpect != null and recExpect != ''">rec_result,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="recName != null and recName != ''">#{recName},</if>
+            <if test="pubName != null and pubName != ''">#{pubName},</if>
+            <if test="recCondition != null and recCondition != ''">#{recCondition},</if>
+            <if test="recResume != null and recResume != ''">#{recResume},</if>
+<!--            <if test="recTime != null">#{recTime},</if>-->
+            <if test="recExpect != null and recExpect != ''">#{recExpect},</if>
+        </trim>
+    </insert>
+<!--根据rec_name删除-->
+    <delete id="deleteInnerRecommendationItemByRecName" parameterType="String">
+        delete from inner_recommendation_item where rec_name = #{recName}
+    </delete>
+<!--删除recommendation_list中的数据-->
+    <delete id="deleteInRecommendationList" parameterType="InnerRecommendationItem">
+        delete from recommendation_list where rec_name = #{recName} and pub_name = #{pubName} and rec_condition = '待审核'
+    </delete>
+<!--批量删除操作-->
+    <delete id="deleteInnerRecommendationItemByRecNames" parameterType="String">
+        delete from inner_recommendation_item where rec_name in 
+        <foreach item="recName" collection="array" open="(" separator="," close=")">
+            #{recName}
+        </foreach>
+    </delete>
+</mapper>

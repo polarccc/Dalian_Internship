@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.RecommendationSys.mapper.RecommendationListMapper">
+    
+    <resultMap type="RecommendationList" id="RecommendationListResult">
+        <result property="recLogId"    column="rec_log_id"    />
+        <result property="recName"    column="rec_name"    />
+        <result property="pubName"    column="pub_name"   />
+        <result property="candidateCondition"    column="candidate_condition"    />
+        <result property="recResult"    column="rec_result"    />
+        <result property="recCondition"    column="rec_condition"    />
+        <result property="recTime"    column="rec_time"    />
+        <result property="recResume"  column="rec_resume"  />
+    </resultMap>
+
+    <sql id="selectRecommendationListVo">
+        select rec_log_id, rec_name, pub_name, candidate_condition, rec_result, rec_condition, rec_time, rec_resume from recommendation_list
+    </sql>
+
+<!--    按照不同字段查询信息-->
+    <select id="selectRecommendationListList" parameterType="RecommendationList" resultMap="RecommendationListResult">
+        <include refid="selectRecommendationListVo"/>
+        <where>  
+            <if test="recLogId != null "> and rec_log_id = #{recLogId}</if>
+            <if test="recName != null  and recName != ''"> and rec_name like concat('%', #{recName}, '%')</if>
+            <if test="pubName != null  and pubName != ''"> and pub_name like concat('%', #{pubName}, '%')</if>
+            <if test="recCondition != null "> and rec_condition = #{recCondition}</if>
+        </where>
+    </select>
+    
+    <select id="selectRecommendationListByRecLogId" parameterType="Long" resultMap="RecommendationListResult">
+        <include refid="selectRecommendationListVo"/>
+        where rec_log_id = #{recLogId}
+    </select>
+
+    <insert id="insertRecommendationList" parameterType="RecommendationList" useGeneratedKeys="true" keyProperty="recLogId">
+        insert into recommendation_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="recName != null and recName != ''">rec_name,</if>
+            <if test="pubName != null and pubName != ''">pub_name,</if>
+            <if test="candidateCondition != null and candidateCondition != ''">candidate_condition,</if>
+            <if test="recResult != null and recResult != ''">rec_result,</if>
+            <if test="recCondition != null">rec_condition,</if>
+            <if test="recTime != null">rec_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="recName != null and recName != ''">#{recName},</if>
+            <if test="pubName != null and pubName != ''">#{pubName},</if>
+            <if test="candidateCondition != null and candidateCondition != ''">#{candidateCondition},</if>
+            <if test="recResult != null and recResult != ''">#{recResult},</if>
+            <if test="recCondition != null">#{recCondition},</if>
+            <if test="recTime != null">#{recTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRecommendationList" parameterType="RecommendationList">
+        update recommendation_list
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="recName != null and recName != ''">rec_name = #{recName},</if>
+            <if test="pubName != null and pubName != ''">pub_name = #{pubName},</if>
+            <if test="candidateCondition != null and candidateCondition != ''">candidate_condition = #{candidateCondition},</if>
+            <if test="recResult != null and recResult != ''">rec_result = #{recResult},</if>
+            <if test="recCondition != null">rec_condition = #{recCondition},</if>
+            <if test="recTime != null">rec_time = #{recTime},</if>
+        </trim>
+        where rec_log_id = #{recLogId}
+    </update>
+
+    <delete id="deleteRecommendationListByRecLogId" parameterType="Long">
+        delete from recommendation_list where rec_log_id = #{recLogId}
+    </delete>
+
+    <delete id="deleteRecommendationListByRecLogIds" parameterType="String">
+        delete from recommendation_list where rec_log_id in 
+        <foreach item="recLogId" collection="array" open="(" separator="," close=")">
+            #{recLogId}
+        </foreach>
+    </delete>
+</mapper>
